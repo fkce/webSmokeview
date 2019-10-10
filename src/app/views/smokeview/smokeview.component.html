@@ -1,0 +1,23 @@
+<div class="top">
+    <p class="left">webSmokeview</p>
+    <button (click)="show_blockages = !show_blockages">Show obst: {{show_blockages}}</button>
+    <button (click)="show_geom = !show_geom">Show geom: {{show_geom}}</button>
+    <button (click)="show_outlines = !show_outlines">Show outlines: {{show_outlines}}</button>
+    <button (click)="show_slice_node = !show_slice_node">Show slice node: {{show_slice_node}}</button>
+    <button (click)="show_slice_cell = !show_slice_cell">Show slice cell: {{show_slice_cell}}</button>
+    <button (click)="show_slice_cen = !show_slice_cen">Show slice cen: {{show_slice_cen}}</button>
+    <button (click)="show_slice_geom = !show_slice_geom">Show slice geom: {{show_slice_geom}}</button>
+    <button (click)="show_bndf_node = !show_bndf_node">Show bndf geom: {{show_bndf_node}}</button>
+    <button (click)="xxx()">Stop</button>
+    <button (click)="nframes = 2">Start</button>
+</div>
+
+<div class="main">
+    <div class="left"></div>
+
+    <div class="center">
+        <canvas width="1200" height="800" #webSmokeview></canvas>
+    </div>
+
+    <div class="right"></div>
+</div>

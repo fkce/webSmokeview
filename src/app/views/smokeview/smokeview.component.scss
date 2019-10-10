@@ -1,0 +1,45 @@
+.top {
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  width: 100%;
+  .button {
+    margin-right: 1rem;
+  }
+  .left {
+    display: flex;
+    flex-grow: 1;
+    margin-left: 1rem;
+  }
+}
+
+.main {
+  display: flex;
+  width: 100%;
+
+  .left {
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+  }
+
+  .center {
+    width: 80%;
+
+    div.smokeview {
+      width: 100%;
+      min-height: 35rem;
+      text-align: center;
+    }
+  }
+
+  .right {
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+    menu {
+      margin: 0;
+      padding: 0;
+    }
+  }
+}
