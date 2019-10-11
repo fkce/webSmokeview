@@ -14,7 +14,6 @@ export class BndfService {
   frame_bndf_node: number = 24;
 
   // boundary file triangles
-
   vertices_bndf_node = [
     0.75, 0.125, 0.00, 1.00, 0.125, 0.00, 1.00, 0.375, 0.00, 0.75, 0.375, 0.00,
     0.75, 0.125, 0.25, 1.00, 0.125, 0.25, 1.00, 0.375, 0.25, 0.75, 0.375, 0.25,

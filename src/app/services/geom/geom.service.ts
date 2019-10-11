@@ -56,6 +56,7 @@ export class GeomService {
     16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23
   ];
 
+
   constructor(
     private glS: GlService
   ) { }

@@ -66,6 +66,7 @@ export class SmokeviewComponent implements AfterViewInit {
   texture_colorbar_data = null;
   texture_colorbar_numcolors = null;
 
+
   constructor(
     public glS: GlService,
     public obstService: ObstService,
