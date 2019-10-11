@@ -3,11 +3,20 @@
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.2.0. It's web version of smokeview. 
 
 ## Installing webSmokeview
-1. 
+1. Get Node.js: https://nodejs.org/en/download/ or install it using package manager.
+2. Download last release ...
+3. Unzip package
+4. Run in terminal:
+```
+$ cd webSmokeview
+$ npm install
+$ node app.js
+```
+5. Open ``http://localhost:3000``
 
 ## Development & Backend server
 1. Clone git repo.
-2. Get the the Node.js: https://nodejs.org/en/download/ or install it using package manager.
+2. Get Node.js: https://nodejs.org/en/download/ or install it using package manager.
 3. Run command line and install all required javascript packages:
 ```
 $ cd webSmokeview
