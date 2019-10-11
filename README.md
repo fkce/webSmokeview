@@ -4,7 +4,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Installing webSmokeview
 1. Get Node.js: https://nodejs.org/en/download/ or install it using package manager.
-2. Download last release ...
+2. Download last release: 
 3. Unzip package
 4. Run in terminal:
 ```
