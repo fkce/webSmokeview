@@ -7,7 +7,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 Run `npm install` to get all required js modeles. Then run `npm start` in root directory for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 ## Backend server
-Install nodemon package globally `npm install nodemog -g` and then run `nodemon app.js` in `backend` directory for a dev server. Create `public` directory and put there some index.html file for testing. Navigate to `http://localhost:3000/`. Copy here all files from `dist/` directory (read below). 
+Install nodemon package globally `npm install nodemog -g` and then install rest packages `npm install`. After that run `nodemon app.js` in `backend` directory for a dev backend server. Create `public` directory and put there some index.html file for testing. Navigate to `http://localhost:3000/`. Copy to `public` all files from `dist/` directory (read below) to run production server. 
 
 ## Build
 
