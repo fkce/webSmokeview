@@ -2,6 +2,9 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.2.0. It's web version of smokeview. 
 
+## Installing webSmokeview
+1. 
+
 ## Development & Backend server
 1. Clone git repo.
 2. Get the the Node.js: https://nodejs.org/en/download/ or install it using package manager.
