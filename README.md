@@ -7,7 +7,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 Run `npm start` in root directory for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 ## Backend server
-Run `nodemon app.js` in `backend` directory for a dev server. Navigate to `http://localhost:3000/`. If you are able to see `Hello webSmokeview` that means it's working properly.
+Run `nodemon app.js` in `backend` directory for a dev server. Create `public` directory and put there some index.html file for testing. Navigate to `http://localhost:3000/`. Copy here all files from `dist/` directory (read below). 
 
 ## Build
 
