@@ -9,6 +9,7 @@ var _ = require('lodash')
 
 // Create https server
 const https = require('https');
+const http = require('http');
 
 // Allow cors for development purpose
 app.use(cors())
@@ -24,5 +25,8 @@ const options = {
   cert: fs.readFileSync('d:/fullchain.pem')
 };
 
-var httpsServer = https.createServer(options, app)
-httpsServer.listen(port)
+//var httpsServer = https.createServer(options, app)
+var httpServer = http.createServer(app)
+
+//httpsServer.listen(port)
+httpServer.listen(port)
