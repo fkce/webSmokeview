@@ -7,8 +7,8 @@
     <button (click)="sliceService.show_cell = !sliceService.show_cell">Show slice cell: {{sliceService.show_cell}}</button>
     <button (click)="sliceService.show_cen = !sliceService.show_cen">Show slice cen: {{sliceService.show_cen}}</button>
     <button (click)="sliceService.show_geom = !sliceService.show_geom">Show slice geom: {{sliceService.show_geom}}</button>
-    <button (click)="show_bndf_node = !show_bndf_node">Show bndf geom: {{show_bndf_node}}</button>
-    <button (click)="xxx()">Stop</button>
+    <button (click)="bndfService.show_node = !bndfService.show_node">Show bndf geom: {{bndfService.show_node}}</button>
+    <button (click)="nframes = 1">Stop</button>
     <button (click)="nframes = 2">Start</button>
     <p>Frame: {{iframe}}</p>
 </div>

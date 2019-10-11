@@ -6,6 +6,7 @@ import { BndfService } from 'src/app/services/bndf/bndf.service';
 import { PartService } from 'src/app/services/part/part.service';
 import { GeomService } from 'src/app/services/geom/geom.service';
 import { LineService } from 'src/app/services/line/line.service';
+import { GlService } from 'src/app/services/gl/gl.service';
 
 @Component({
   selector: 'app-smokeview',
@@ -66,6 +67,7 @@ export class SmokeviewComponent implements AfterViewInit {
   texture_colorbar_numcolors = null;
 
   constructor(
+    public glS: GlService,
     public obstService: ObstService,
     private shaderService: ShaderService,
     public sliceService: SliceService,
@@ -83,40 +85,16 @@ export class SmokeviewComponent implements AfterViewInit {
     var self = this;
 
     this.gl = this.canvas.nativeElement.getContext('experimental-webgl');
-    if (!this.gl) {
+    this.glS.gl = this.canvas.nativeElement.getContext('experimental-webgl');
+    if (!this.glS.gl) {
       alert("Your browser does not support webgl");
       return;
     }
     this.ext_32bit = this.gl.getExtension('OES_element_index_uint');
-
-    // defining and storing the geometry
+    this.glS.ext_32bit = this.glS.gl.getExtension('OES_element_index_uint');
 
     //***VERTS
     //HIDE_ON
-
-
-    // setup geom data
-
-    var buffer_vertices_geom_lit = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer_vertices_geom_lit);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.geomService.vertices_lit), this.gl.STATIC_DRAW);
-
-    var buffer_normals_geom_lit = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer_normals_geom_lit);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.geomService.normals_lit), this.gl.STATIC_DRAW);
-
-    var buffer_colors_geom_lit = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer_colors_geom_lit);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.geomService.colors_lit), this.gl.STATIC_DRAW);
-
-    var buffer_indices_geom_lit = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, buffer_indices_geom_lit);
-    if (this.ext_32bit == null) {
-      this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.geomService.indices_lit), this.gl.STATIC_DRAW);
-    }
-    else {
-      this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(this.geomService.indices_lit), this.gl.STATIC_DRAW);
-    }
 
     // setup colorbar
 
@@ -129,11 +107,12 @@ export class SmokeviewComponent implements AfterViewInit {
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
 
-    this.setupObstData();
+    this.obstService.setupObstData();
+    this.geomService.setupGeomData();
     this.setupSliceNodeData();
     this.setupSliceCellData();
-
     this.setupSliceGeomData();
+
     this.setupBndfData();
     this.setupLineData();
     this.setupPartData();
@@ -566,22 +545,22 @@ export class SmokeviewComponent implements AfterViewInit {
         self.gl.uniformMatrix4fv(_Mmatrix_geom_lit, false, mo_matrix);
         self.gl.uniformMatrix4fv(_normal_matrix_geom_lit, false, normal_matrix);
 
-        self.gl.bindBuffer(self.gl.ARRAY_BUFFER, buffer_vertices_geom_lit);
+        self.gl.bindBuffer(self.gl.ARRAY_BUFFER, self.geomService.buffer_vertices_lit);
         var _position_geom_lit = self.gl.getAttribLocation(shaderprogram_geom_lit, "position");
         self.gl.vertexAttribPointer(_position_geom_lit, 3, self.gl.FLOAT, false, 0, 0);
         self.gl.enableVertexAttribArray(_position_geom_lit);
 
-        self.gl.bindBuffer(self.gl.ARRAY_BUFFER, buffer_colors_geom_lit);
+        self.gl.bindBuffer(self.gl.ARRAY_BUFFER, self.geomService.buffer_colors_lit);
         var _color_geom_lit = self.gl.getAttribLocation(shaderprogram_geom_lit, "color");
         self.gl.vertexAttribPointer(_color_geom_lit, 3, self.gl.FLOAT, false, 0, 0);
         self.gl.enableVertexAttribArray(_color_geom_lit);
 
-        self.gl.bindBuffer(self.gl.ARRAY_BUFFER, buffer_normals_geom_lit);
+        self.gl.bindBuffer(self.gl.ARRAY_BUFFER, self.geomService.buffer_normals_lit);
         var _normal_geom_lit = self.gl.getAttribLocation(shaderprogram_geom_lit, "normal");
         self.gl.vertexAttribPointer(_normal_geom_lit, 3, self.gl.FLOAT, false, 0, 0);
         self.gl.enableVertexAttribArray(_normal_geom_lit);
 
-        self.gl.bindBuffer(self.gl.ELEMENT_ARRAY_BUFFER, buffer_indices_geom_lit);
+        self.gl.bindBuffer(self.gl.ELEMENT_ARRAY_BUFFER, self.geomService.buffer_indices_lit);
 
         if (self.ext_32bit == null) {
           self.gl.drawElements(self.gl.TRIANGLES, self.geomService.indices_lit.length, self.gl.UNSIGNED_SHORT, 0);
@@ -819,30 +798,6 @@ export class SmokeviewComponent implements AfterViewInit {
 
   }
 
-  // setup blockage data
-
-  setupObstData() {
-    this.obstService.buffer_vertices_lit = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.obstService.buffer_vertices_lit);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.obstService.vertices_lit), this.gl.STATIC_DRAW);
-
-    this.obstService.buffer_normals_lit = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.obstService.buffer_normals_lit);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.obstService.normals_lit), this.gl.STATIC_DRAW);
-
-    this.obstService.buffer_colors_lit = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.obstService.buffer_colors_lit);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.obstService.colors_lit), this.gl.STATIC_DRAW);
-
-    this.obstService.buffer_indices_lit = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.obstService.buffer_indices_lit);
-    if (this.ext_32bit == null) {
-      this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.obstService.indices_lit), this.gl.STATIC_DRAW);
-    }
-    else {
-      this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(this.obstService.indices_lit), this.gl.STATIC_DRAW);
-    }
-  }
 
   // setup slice node file data
   setupSliceNodeData() {

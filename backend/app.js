@@ -20,10 +20,10 @@ require('./routes/routes')(app)
 app.use(express.static(path.join(__dirname, 'public')))
 
 // Https keys
-const options = {
-  key: fs.readFileSync('d:/privkey.pem'),
-  cert: fs.readFileSync('d:/fullchain.pem')
-};
+//const options = {
+//  key: fs.readFileSync('d:/privkey.pem'),
+//  cert: fs.readFileSync('d:/fullchain.pem')
+//};
 
 //var httpsServer = https.createServer(options, app)
 var httpServer = http.createServer(app)
