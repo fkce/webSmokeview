@@ -3,14 +3,13 @@
     <button (click)="show_blockages = !show_blockages">Show obst: {{show_blockages}}</button>
     <button (click)="show_geom = !show_geom">Show geom: {{show_geom}}</button>
     <button (click)="show_outlines = !show_outlines">Show outlines: {{show_outlines}}</button>
-    <button (click)="sliceService.show_node = !sliceService.show_node">Show slice node: {{sliceService.show_node}}</button>
-    <button (click)="sliceService.show_cell = !sliceService.show_cell">Show slice cell: {{sliceService.show_cell}}</button>
-    <button (click)="sliceService.show_cen = !sliceService.show_cen">Show slice cen: {{sliceService.show_cen}}</button>
-    <button (click)="sliceService.show_geom = !sliceService.show_geom">Show slice geom: {{sliceService.show_geom}}</button>
+    <button (click)="sliceNodeService.show_node = !sliceNodeService.show_node">Show slice node: {{sliceNodeService.show_node}}</button>
+    <button (click)="sliceCellService.show_cell = !sliceCellService.show_cell">Show slice cell: {{sliceCellService.show_cell}}</button>
+    <!--<button (click)="sliceService.show_cen = !sliceService.show_cen">Show slice cen: {{sliceService.show_cen}}</button>-->
+    <button (click)="sliceGeomService.show_geom = !sliceGeomService.show_geom">Show slice geom: {{sliceGeomService.show_geom}}</button>
     <button (click)="bndfService.show_node = !bndfService.show_node">Show bndf geom: {{bndfService.show_node}}</button>
     <button (click)="nframes = 1">Stop</button>
-    <button (click)="nframes = 2">Start</button>
-
+    <button (click)="nframes = 3">Start</button>
     <p>Frame: {{iframe}}</p>
 </div>
 
@@ -18,7 +17,7 @@
     <div class="left"></div>
 
     <div class="center">
-        <canvas width="1200" height="800" #webSmokeview canvasEvents></canvas>
+        <canvas width="1200" height="800" #webSmokeview canvas></canvas>
     </div>
 
     <div class="right"></div>

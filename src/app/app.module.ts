@@ -11,11 +11,13 @@ import { HttpManagerInterceptor } from './services/http-manager/http-manager.int
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SmokeviewComponent } from './views/smokeview/smokeview.component';
+import { CanvasDirective } from './directives/canvas/canvas.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
-    SmokeviewComponent
+    SmokeviewComponent,
+    CanvasDirective
   ],
   imports: [
     BrowserModule,
