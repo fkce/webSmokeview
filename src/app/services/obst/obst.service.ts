@@ -1,229 +1,170 @@
 import { Injectable, isDevMode } from '@angular/core';
 import { HttpManagerService, Result } from '../http-manager/http-manager.service';
-import { GlService } from '../gl/gl.service';
+import { BabylonService } from '../babylon/babylon.service';
+import * as BABYLON from 'babylonjs';
+import { cloneDeep } from 'lodash';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ObstService {
 
-  buffer_vertices_lit = null;
-  buffer_colors_lit = null;
-  buffer_normals_lit = null;
-  buffer_indices_lit = null;
+  vertices = [];
+  normals = [];
+  colors = [];
+  indices = [];
 
-  vertShader_lit = null;
-  fragShader_lit = null;
-  shaderprogram_lit = null;
+  mesh;
+  vertexData;
+  material;
 
-  _Pmatrix_lit = null;
-  _Vmatrix_lit = null;
-  _Mmatrix_lit = null;
-  _normal_matrix_lit = null;
-
-  /*=================== obst shaders =================== */
-  vertCode_obst_lit = 'attribute vec3 position;' +
-    'uniform mat4 Pmatrix;' +
-    'uniform mat4 Vmatrix;' +
-    'uniform mat4 Mmatrix;' +
-    'uniform mat4 normal_matrix;' +
-    'attribute vec3 color;' + //the color of the point
-    'attribute vec3 normal;' +//the normal of the point
-    'varying highp vec3 vcolor;' +
-    'varying highp vec3 normalInterp;' +
-    'varying highp vec3 vertPos;' +
-    'void main(void) { ' +
-    'vec4 vertPos4 = Vmatrix * Mmatrix * vec4(position, 1.0);' +
-    'vertPos = vec3(vertPos4) / vertPos4.w;' +
-    'normalInterp = vec3(normal_matrix * vec4(normal, 0.0));' +
-    'vcolor = color;' +
-    'gl_Position = Pmatrix * vertPos4;' +
-    '}';
-
-  fragCode_obst_lit = 'precision mediump float;' +
-    'varying highp vec3 vcolor;' +
-    'precision mediump float;' +
-    'varying highp vec3 normalInterp;' +                // Surface normal
-    'varying highp vec3 vertPos;' +                     // Vertex position
-    'vec3  ambientColor=vec3(1.0, 1.0, 1.0);' +
-    'vec3  diffuseColor=vec3(0.6, 0.6, 0.6);' +
-    'vec3 specularColor=vec3(1.0, 1.0, 1.0);' +
-    'vec3 lightPos=vec3(1.0,1.0,-1.0);' +         // Light position
-    'float Ka=0.1;' +                             // Ambient reflection coefficient
-    'float Kd=0.2;' +                             // Diffuse reflection coefficient
-    'float Ks=0.1;' +                             // Specular reflection coefficient
-    'float shininessVal=10.0;' +                  // Shininess
-    'void main() {' +
-    '  vec3 N = normalize(normalInterp);' +
-    '  vec3 L = normalize(lightPos - vertPos);' +
-    '  float lambertian = max(dot(N, L), 0.0);' +
-    '  float specular = 0.0;' +
-    '  if(lambertian > 0.0) {' +
-    '    vec3 R = reflect(-L, N);' +              // Reflected light vector
-    '    vec3 V = normalize(-vertPos);' +         // Vector to viewer
-    '    float specAngle = max(dot(R, V), 0.0);' +
-    '    specular = pow(specAngle, shininessVal);' +
-    '  }' +
-    '  gl_FragColor = vec4((1.0-Ka-Kd)*vcolor + Ka * ambientColor +' +
-    '                      Kd * lambertian * diffuseColor +' +
-    '                      Ks * specular * specularColor, 1.0);' +
-    '}';
-
-  vertices_lit = [
-    0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.5, 0.0, // bottom
-    0.0, 0.0, 0.5, 0.5, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, 0.5, 0.5, // top
-    0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.5, // left
-    0.5, 0.0, 0.0, 0.5, 0.5, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, 0.5, // right
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.5, 0.5, 0.0, 0.0, // back
-    0.0, 0.5, 0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.0, // front
-
-    1.0, 1.0, 1.0, 1.5, 1.0, 1.0, 1.5, 1.5, 1.0, 1.0, 1.5, 1.0, // bottom
-    1.0, 1.0, 1.5, 1.5, 1.0, 1.5, 1.5, 1.5, 1.5, 1.0, 1.5, 1.5, // top
-    1.0, 1.0, 1.0, 1.0, 1.5, 1.0, 1.0, 1.5, 1.5, 1.0, 1.0, 1.5, // left
-    1.5, 1.0, 1.0, 1.5, 1.5, 1.0, 1.5, 1.5, 1.5, 1.5, 1.0, 1.5, // right
-    1.0, 1.0, 1.0, 1.0, 1.0, 1.5, 1.5, 1.0, 1.5, 1.5, 1.0, 1.0, // back
-    1.0, 1.5, 1.0, 1.0, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.0, // front
-  ];
-
-  normals_lit = [
-    0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, // bottom
-    0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, // top
-    -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, // left
-    1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, // right
-    0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, // back
-    0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,  // front
-    0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, // bottom
-    0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, // top
-    -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, // left
-    1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, // right
-    0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, // back
-    0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0  // front
-  ];
-
-  colors_lit = [
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0,
-    1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1,
-    0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-    0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
-
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0,
-    1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1,
-    0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-    0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0
-  ];
-
-  indices_lit = [
-    0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7,
-    8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15,
-    16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23,
-
-    24, 25, 26, 24, 26, 27, 28, 29, 30, 28, 30, 31,
-    32, 33, 34, 32, 34, 35, 36, 37, 38, 36, 38, 39,
-    40, 41, 42, 40, 42, 43, 44, 45, 46, 44, 46, 47
-  ];
+  clipX: number = 0.0;
+  clipY: number = 0.0;
+  clipZ: number = 100.0;
 
   constructor(
     private httpManager: HttpManagerService,
-    private glS: GlService
+    private babylonService: BabylonService
   ) { }
 
-  // setup blockage data
-  public setupData() {
+  /**
+   * Render current obst geometry
+   */
+  public render() {
 
-    this.buffer_vertices_lit = this.glS.gl.createBuffer();
-    this.glS.gl.bindBuffer(this.glS.gl.ARRAY_BUFFER, this.buffer_vertices_lit);
-    this.glS.gl.bufferData(this.glS.gl.ARRAY_BUFFER, new Float32Array(this.vertices_lit), this.glS.gl.STATIC_DRAW);
-
-    this.buffer_normals_lit = this.glS.gl.createBuffer();
-    this.glS.gl.bindBuffer(this.glS.gl.ARRAY_BUFFER, this.buffer_normals_lit);
-    this.glS.gl.bufferData(this.glS.gl.ARRAY_BUFFER, new Float32Array(this.normals_lit), this.glS.gl.STATIC_DRAW);
-
-    this.buffer_colors_lit = this.glS.gl.createBuffer();
-    this.glS.gl.bindBuffer(this.glS.gl.ARRAY_BUFFER, this.buffer_colors_lit);
-    this.glS.gl.bufferData(this.glS.gl.ARRAY_BUFFER, new Float32Array(this.colors_lit), this.glS.gl.STATIC_DRAW);
-
-    this.buffer_indices_lit = this.glS.gl.createBuffer();
-    this.glS.gl.bindBuffer(this.glS.gl.ELEMENT_ARRAY_BUFFER, this.buffer_indices_lit);
-    if (this.glS.ext_32bit == null) {
-      this.glS.gl.bufferData(this.glS.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices_lit), this.glS.gl.STATIC_DRAW);
+    if (!this.mesh) {
+      // Create new custom mesh and vertex data
+      this.mesh = new BABYLON.Mesh("custom", this.babylonService.scene);
+      this.vertexData = new BABYLON.VertexData();
     }
-    else {
-      this.glS.gl.bufferData(this.glS.gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(this.indices_lit), this.glS.gl.STATIC_DRAW);
+
+    // Compute normals
+    BABYLON.VertexData.ComputeNormals(this.vertices, this.indices, this.normals);
+
+    // Add alpha = 1.0 every 3rd elemnet to color array
+    //for (var itemIndex = 3; itemIndex < this.colors.length; itemIndex += 4) {
+    //  this.colors.splice(itemIndex, 0, 1.0);
+    //}
+    //this.colors.push(1.0);
+
+    // Assign data
+    this.vertexData.positions = this.vertices;
+    this.vertexData.indices = this.indices;
+    this.vertexData.colors = this.colors;
+    this.vertexData.normals = this.normals;
+    this.vertexData.applyToMesh(this.mesh);
+
+    // Create material with shaders
+    if (!this.material) {
+      this.material = new BABYLON.ShaderMaterial("shader", this.babylonService.scene, '/assets/obst',
+        {
+          attributes: ["position", "color", "normal"],
+          uniforms: ["world", "worldView", "worldViewProjection", "view", "projection"]
+        });
+      this.material.backFaceCulling = false;
+      this.material.useLogarithmicDepth = true;
+      this.material.zOffset = 0.2;
+
+      this.material.setFloat("clipX", 0);
+      this.material.setFloat("clipY", 0);
+      this.material.setFloat("clipZ", 1);
+      //this.material.wireframe = true;
+
+      this.mesh.material = this.material;
     }
   }
 
-  public draw() {
-      this.glS.gl.useProgram(this.shaderprogram_lit);
-      this.glS.gl.uniformMatrix4fv(this._Pmatrix_lit, false, this.glS.proj_matrix);
-      this.glS.gl.uniformMatrix4fv(this._Vmatrix_lit, false, this.glS.view_matrix);
-      this.glS.gl.uniformMatrix4fv(this._Mmatrix_lit, false, this.glS.mo_matrix);
-      this.glS.gl.uniformMatrix4fv(this._normal_matrix_lit, false, this.glS.normal_matrix);
+  /**
+   * Clip mesh
+   * @param value percentage
+   * @param direction x, y, z direction
+   */
+  public clip(value: number, direction: string) {
 
-      this.glS.gl.bindBuffer(this.glS.gl.ARRAY_BUFFER, this.buffer_vertices_lit);
-      var _position_obst_lit = this.glS.gl.getAttribLocation(this.shaderprogram_lit, "position");
-      this.glS.gl.vertexAttribPointer(_position_obst_lit, 3, this.glS.gl.FLOAT, false, 0, 0);
-      this.glS.gl.enableVertexAttribArray(_position_obst_lit);
-
-      this.glS.gl.bindBuffer(this.glS.gl.ARRAY_BUFFER, this.buffer_colors_lit);
-      var _color_obst_lit = this.glS.gl.getAttribLocation(this.shaderprogram_lit, "color");
-      this.glS.gl.vertexAttribPointer(_color_obst_lit, 3, this.glS.gl.FLOAT, false, 0, 0);
-      this.glS.gl.enableVertexAttribArray(_color_obst_lit);
-
-      this.glS.gl.bindBuffer(this.glS.gl.ARRAY_BUFFER, this.buffer_normals_lit);
-      var _normal_obst_lit = this.glS.gl.getAttribLocation(this.shaderprogram_lit, "normal");
-      this.glS.gl.vertexAttribPointer(_normal_obst_lit, 3, this.glS.gl.FLOAT, false, 0, 0);
-      this.glS.gl.enableVertexAttribArray(_normal_obst_lit);
-
-      this.glS.gl.bindBuffer(this.glS.gl.ELEMENT_ARRAY_BUFFER, this.buffer_indices_lit);
-
-      if (this.glS.ext_32bit == null) {
-        this.glS.gl.drawElements(this.glS.gl.TRIANGLES, this.indices_lit.length, this.glS.gl.UNSIGNED_SHORT, 0);
-      }
-      else {
-        this.glS.gl.drawElements(this.glS.gl.TRIANGLES, this.indices_lit.length, this.glS.gl.UNSIGNED_INT, 0);
-      }
-
+    let boundingMax = this.mesh.getBoundingInfo().maximum;
+    if(direction == 'x') {
+      this.clipX = value;
+      let clip = (value == 100) ? 1.1 : boundingMax.x * (value / 100);
+      clip = (value == 0) ? -0.1 : clip;
+      this.mesh.material.setFloat("clipX", clip);
+    } 
+    else if (direction == 'y') {
+      this.clipY = value;
+      let clip = (value == 100) ? 1.1 : boundingMax.y * (value / 100);
+      clip = (value == 0) ? -0.1 : clip;
+      this.mesh.material.setFloat("clipY", clip);
+    }
+    else if (direction == 'z') {
+      this.clipZ = value;
+      let clip = (value == 100) ? 1.1 : boundingMax.z * (value / 100);
+      clip = (value == 0) ? -0.1 : clip;
+      this.mesh.material.setFloat("clipZ", clip);
+    }
   }
 
-  /*=================== obst shaders =================== */
-  public createShaders() {
+  /**
+   * Get default obsts from server
+   */
+  public getFromServer() {
 
-    this.vertShader_lit = this.glS.gl.createShader(this.glS.gl.VERTEX_SHADER);
-    this.glS.gl.shaderSource(this.vertShader_lit, this.vertCode_obst_lit);
-    this.glS.gl.compileShader(this.vertShader_lit);
-
-    this.fragShader_lit = this.glS.gl.createShader(this.glS.gl.FRAGMENT_SHADER);
-    this.glS.gl.shaderSource(this.fragShader_lit, this.fragCode_obst_lit);
-    this.glS.gl.compileShader(this.fragShader_lit);
-
-    this.shaderprogram_lit = this.glS.gl.createProgram();
-    this.glS.gl.attachShader(this.shaderprogram_lit, this.vertShader_lit);
-    this.glS.gl.attachShader(this.shaderprogram_lit, this.fragShader_lit);
-    this.glS.gl.linkProgram(this.shaderprogram_lit);
-
-    this._Pmatrix_lit = this.glS.gl.getUniformLocation(this.shaderprogram_lit, "Pmatrix");
-    this._Vmatrix_lit = this.glS.gl.getUniformLocation(this.shaderprogram_lit, "Vmatrix");
-    this._Mmatrix_lit = this.glS.gl.getUniformLocation(this.shaderprogram_lit, "Mmatrix");
-    this._normal_matrix_lit = this.glS.gl.getUniformLocation(this.shaderprogram_lit, "normal_matrix");
-  }
-
-  // exaple backend request
-  public getObsts() {
-    this.httpManager.get('https://localhost:3000/api/test').then(
+    this.httpManager.get(environment.host +'/api/obsts').then(
       (result: Result) => {
 
         if (result.meta.status == 'success') {
-          return result.data;
-        }
-      },
-      (error) => {
-        if (isDevMode()) console.log(error);
-      });
+          // Asigning variables
+          this.vertices = result.data.vertices;
+          this.colors = result.data.colors;
+          this.indices = result.data.indices;
 
+          this.render();
+          this.zoomToCenter();
+          this.zoomToMesh();
+        }
+      });
+  }
+
+  /**
+   * Get obsts from json file
+   * @param json Object with vertices, colors, indices, normals
+   */
+  public getFromFile(json: any) {
+
+    this.vertices = json.vertices;
+    this.colors = json.colors;
+    this.indices = json.indices;
+
+    this.render();
+    this.zoomToCenter();
+    this.zoomToMesh();
+  }
+
+  /**
+   * Move camera to mesh center
+   */
+  public zoomToCenter() {
+
+    // Set camera target to the center of obst mesh
+    let bounding = cloneDeep(this.mesh.getBoundingInfo().boundingSphere);
+
+    this.babylonService.camera.setTarget(bounding.centerWorld);
+    this.babylonService.camera.setPosition(new BABYLON.Vector3(bounding.centerWorld.x, bounding.centerWorld.y -2, bounding.centerWorld.z));
+  }
+
+  /**
+   * Zoom to mesh
+   */
+  public zoomToMesh() {
+
+    // Zoom in/out to mesh
+    let radius = this.mesh.getBoundingInfo().boundingSphere.radiusWorld;
+    let aspectRatio = this.babylonService.engine.getAspectRatio(this.babylonService.camera);
+    let halfMinFov = this.babylonService.camera.fov / 2;
+    if (aspectRatio < 1) {
+      halfMinFov = Math.atan(aspectRatio * Math.tan(this.babylonService.camera.fov / 2));
+    }
+    let viewRadius = Math.abs(radius / Math.sin(halfMinFov));
+    this.babylonService.camera.radius = viewRadius;
   }
 
 }

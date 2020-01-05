@@ -11,13 +11,16 @@ import { HttpManagerInterceptor } from './services/http-manager/http-manager.int
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SmokeviewComponent } from './views/smokeview/smokeview.component';
-import { CanvasDirective } from './directives/canvas/canvas.directive';
+
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 
 @NgModule({
   declarations: [
     AppComponent,
     SmokeviewComponent,
-    CanvasDirective
   ],
   imports: [
     BrowserModule,
@@ -27,6 +30,10 @@ import { CanvasDirective } from './directives/canvas/canvas.directive';
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule,
+    MatInputModule,
   ],
   providers: [
     HttpManagerService,

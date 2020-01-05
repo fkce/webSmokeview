@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ShaderService } from './shader.service';
+import { BabylonService } from './babylon.service';
 
-describe('ShaderService', () => {
+describe('BabylonService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: ShaderService = TestBed.get(ShaderService);
+    const service: BabylonService = TestBed.get(BabylonService);
     expect(service).toBeTruthy();
   });
 });
