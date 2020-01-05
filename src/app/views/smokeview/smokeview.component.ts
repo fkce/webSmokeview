@@ -17,7 +17,7 @@ export class SmokeviewComponent implements AfterViewInit {
     public obstService: ObstService,
     public sliceGeomService: SliceGeomService,
     private babylonService: BabylonService,
-    private sliceService: SliceService
+    public sliceService: SliceService
   ) { }
 
   ngOnInit() { }
