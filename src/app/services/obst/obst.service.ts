@@ -69,8 +69,10 @@ export class ObstService {
       this.material.setFloat("clipY", 0);
       this.material.setFloat("clipZ", 1);
       //this.material.wireframe = true;
-
       this.mesh.material = this.material;
+      this.mesh.enableEdgesRendering(); 
+      this.mesh.edgesWidth = 0.1;
+      this.mesh.edgesColor = new BABYLON.Color4(0, 0, 1, 1);
     }
   }
 

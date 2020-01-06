@@ -20,6 +20,7 @@ export class SliceService {
   texData = new Float32Array([]);
   frameSize: number;
   frameNo: number = 0;
+  frameCur: number = 0;
 
   mesh;
   vertexData;
@@ -107,15 +108,15 @@ export class SliceService {
 
       this.mesh.material = this.material;
 
-      let i = 0;
+      this.frameCur = 0;
       setInterval(() => {
-        if (i == this.frameNo - 1) i = 0;
+        if (this.frameCur == this.frameNo - 1) this.frameCur = 0;
 
-        this.tex = this.texData.slice(i * this.frameSize, (i + 1) * this.frameSize);
+        this.tex = this.texData.slice(this.frameCur * this.frameSize, (this.frameCur + 1) * this.frameSize);
         this.mesh.setVerticesData("texture_coordinate", this.tex, true, 1);
-        i++;
+        this.frameCur++;
 
-      }, 100);
+      }, 50);
     }
   }
 

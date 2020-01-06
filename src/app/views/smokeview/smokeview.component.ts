@@ -67,4 +67,13 @@ export class SmokeviewComponent implements AfterViewInit {
     }
   }
 
+  /**
+   * 
+   */
+  public onSliderChange(event: any) {
+    console.log(event);
+    this.sliceService.frameCur = event.value;
+
+  }
+
 }

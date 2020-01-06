@@ -15,7 +15,10 @@
         <button class="resetView" type="button" mat-raised-button (click)="obstService.zoomToCenter()">Reset view</button>
         <button class="resetZoom" type="button" mat-raised-button (click)="obstService.zoomToMesh()">Reset zoom</button>
         <button class="wireframe" type="button" mat-raised-button [color]="(obstService.material != undefined && obstService.material.wireframe) ? 'accent' : ''" (click)="obstService.material.wireframe = obstService.material.wireframe ? false : true;">Outline</button>
-        Frames: {{sliceService.frameNo}}
+        Frame: {{sliceService.frameCur}}
+
+        <mat-slider min="0" [max]="sliceService.frameNo" step="1" [value]="sliceService.frameCur" (input)="onSliderChange($event)"></mat-slider>
+        <!-- class="time-slider"  [disabled]="state?.error || currentFile.index === undefined" -->
     </div>
 
     <div class="right">
@@ -30,6 +33,7 @@
             <span><input type="range" [ngModel]="obstService.clipY" (ngModelChange)="obstService.clip($event, 'y')" min="0" max="100" />&nbsp;{{obstService.clipY}}%</span>
             <span><input type="range" [ngModel]="obstService.clipZ" (ngModelChange)="obstService.clip($event, 'z')" min="0" max="100" />&nbsp;{{obstService.clipZ}}%</span><br>
             <button type="button" mat-raised-button (click)="obstService.clip(0, 'x'); obstService.clip(0, 'y'); obstService.clip(100, 'z');">Reset</button>
+
         </p>
     </div>
 </div>
