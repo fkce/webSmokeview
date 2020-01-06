@@ -64,7 +64,6 @@ export class ObstService {
         });
       this.material.backFaceCulling = false;
       this.material.useLogarithmicDepth = true;
-      this.material.zOffset = 0.2;
 
       this.material.setFloat("clipX", 0);
       this.material.setFloat("clipY", 0);
