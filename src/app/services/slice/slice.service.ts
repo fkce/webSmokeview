@@ -5,6 +5,7 @@ import * as BABYLON from 'babylonjs';
 import { cloneDeep } from 'lodash';
 import { environment } from '../../../environments/environment';
 import { colorbars as Colorbars } from '../../consts/colorbars';
+import { PlayerService } from '../player/player.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,9 +19,6 @@ export class SliceService {
   // Color index for each vertex
   tex = new Float32Array([]);
   texData = new Float32Array([]);
-  frameSize: number;
-  frameNo: number = 0;
-  frameCur: number = 0;
 
   mesh;
   vertexData;
@@ -28,7 +26,8 @@ export class SliceService {
 
   constructor(
     private httpManager: HttpManagerService,
-    private babylonService: BabylonService
+    private babylonService: BabylonService,
+    private playerService: PlayerService
   ) { }
 
   /**
@@ -51,9 +50,9 @@ export class SliceService {
     this.vertexData.normals = this.normals;
     this.vertexData.applyToMesh(this.mesh, true);
 
-    this.frameSize = this.vertices.length / 3;
-    this.frameNo = this.texData.length / this.frameSize;
-    this.tex = this.texData.slice(0, this.frameSize);
+    this.playerService.frameSize = this.vertices.length / 3;
+    this.playerService.frameNo = this.texData.length / this.playerService.frameSize;
+    this.tex = this.texData.slice(0, this.playerService.frameSize);
 
     // Add colors to vertices
     this.mesh.setVerticesData("texture_coordinate", this.tex, true, 1);
@@ -108,16 +107,25 @@ export class SliceService {
 
       this.mesh.material = this.material;
 
-      this.frameCur = 0;
-      setInterval(() => {
-        if (this.frameCur == this.frameNo - 1) this.frameCur = 0;
+      // Set manually time
+      //this.playerService.frameCur = 0;
+      //this.tex = this.texData.slice(this.playerService.frameCur * this.playerService.frameSize, (this.playerService.frameCur + 1) * this.playerService.frameSize);
+      //this.mesh.setVerticesData("texture_coordinate", this.tex, true, 1);
 
-        this.tex = this.texData.slice(this.frameCur * this.frameSize, (this.frameCur + 1) * this.frameSize);
-        this.mesh.setVerticesData("texture_coordinate", this.tex, true, 1);
-        this.frameCur++;
+      this.playSlice();
 
-      }, 50);
     }
+  }
+
+  public playSlice() {
+    this.playerService.sliderInterval = setInterval(() => {
+      if (this.playerService.frameCur == this.playerService.frameNo - 1) this.playerService.frameCur = 0;
+
+      this.tex = this.texData.slice(this.playerService.frameCur * this.playerService.frameSize, (this.playerService.frameCur + 1) * this.playerService.frameSize);
+      this.mesh.setVerticesData("texture_coordinate", this.tex, true, 1);
+      this.playerService.frameCur++;
+
+    }, 50);
   }
 
   /**

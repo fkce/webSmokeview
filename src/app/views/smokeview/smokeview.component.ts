@@ -3,6 +3,7 @@ import { ObstService } from 'src/app/services/obst/obst.service';
 import { SliceGeomService } from 'src/app/services/slice/slice-geom.service';
 import { BabylonService } from 'src/app/services/babylon/babylon.service';
 import { SliceService } from 'src/app/services/slice/slice.service';
+import { PlayerService } from 'src/app/services/player/player.service';
 
 @Component({
   selector: 'app-smokeview',
@@ -17,7 +18,8 @@ export class SmokeviewComponent implements AfterViewInit {
     public obstService: ObstService,
     public sliceGeomService: SliceGeomService,
     private babylonService: BabylonService,
-    public sliceService: SliceService
+    public sliceService: SliceService,
+    public playerService: PlayerService
   ) { }
 
   ngOnInit() { }
@@ -67,12 +69,13 @@ export class SmokeviewComponent implements AfterViewInit {
     }
   }
 
-  /**
-   * 
-   */
-  public onSliderChange(event: any) {
-    console.log(event);
-    this.sliceService.frameCur = event.value;
+  public control() {
+    if (this.playerService.play) {
+      this.playerService.stop();
+    } else {
+      this.playerService.start();
+      this.sliceService.playSlice();
+    }
 
   }
 

@@ -17,11 +17,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSliderModule } from '@angular/material/slider';
+import { SliderDirective } from './directives/slider/slider.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
     SmokeviewComponent,
+    SliderDirective,
   ],
   imports: [
     BrowserModule,

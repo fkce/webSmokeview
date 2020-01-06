@@ -23,12 +23,12 @@
       min-height: 30rem;
       text-align: center;
     }
-    button.resetView {
+    button.reset-view {
       position: absolute;
       left: 1rem;
       top: 1rem;
     }
-    button.resetZoom {
+    button.reset-zoom {
       position: absolute;
       left: 1rem;
       top: 4rem;
@@ -37,6 +37,32 @@
       position: absolute;
       left: 1rem;
       top: 7rem;
+    }
+    .player {
+      display: flex;
+      align-items: center;
+      .time {
+        width: 7rem;
+      }
+      .controler {
+        cursor: pointer;
+        margin-right: 0.5rem;
+      }
+      .slider-container {
+        display: flex;
+        flex: 1;
+        height: 1rem;
+        padding: 0;
+        margin: 0;
+        border: 1px solid gray;
+        .slider {
+          min-height: 1rem;
+          width: 0;
+          padding: 0;
+          margin: 0;
+          background-color: red;
+        }
+      }
     }
   }
 

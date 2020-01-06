@@ -12,12 +12,20 @@
 
     <div class="center">
         <canvas class="renderer" #rendererCanvas if="renderCanvas"></canvas>
-        <button class="resetView" type="button" mat-raised-button (click)="obstService.zoomToCenter()">Reset view</button>
-        <button class="resetZoom" type="button" mat-raised-button (click)="obstService.zoomToMesh()">Reset zoom</button>
+        <button class="reset-view" type="button" mat-raised-button (click)="obstService.zoomToCenter()">Reset view</button>
+        <button class="reset-zoom" type="button" mat-raised-button (click)="obstService.zoomToMesh()">Reset zoom</button>
         <button class="wireframe" type="button" mat-raised-button [color]="(obstService.material != undefined && obstService.material.wireframe) ? 'accent' : ''" (click)="obstService.material.wireframe = obstService.material.wireframe ? false : true;">Outline</button>
-        Frame: {{sliceService.frameCur}}
+        
 
-        <mat-slider min="0" [max]="sliceService.frameNo" step="1" [value]="sliceService.frameCur" (input)="onSliderChange($event)"></mat-slider>
+        <div class="player">
+            <div class="time">Frame: {{playerService.frameCur}}</div>
+            <mat-icon class="controler" (click)="control()" *ngIf="!playerService.play">play_circle_outline</mat-icon>
+            <mat-icon class="controler" (click)="control()" *ngIf="playerService.play">pause_circle_outline</mat-icon>
+            <div slider class="slider-container">
+                <div class="slider" [style.width.px]="playerService.setSlider()"></div>
+            </div>
+        </div>
+        <!--<mat-slider class="time-slider" min="0" [max]="playerService.frameNo" step="1" [value]="playerService.frameCur" (input)="playerService.onSliderChange($event)"></mat-slider>-->
         <!-- class="time-slider"  [disabled]="state?.error || currentFile.index === undefined" -->
     </div>
 
