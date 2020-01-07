@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class PlayerService {
 
-  play: boolean = true;
+  isPlay: boolean = true;
 
   dt: number = 50;
 
@@ -26,12 +26,11 @@ export class PlayerService {
     this.frameCur = event.value;
   }
 
-
   /**
    * Set slider bar 
    */
   public setSlider(): number {
-    return (this.sliderWidth - 2) / (this.frameNo - 1) * this.frameCur;
+    return this.sliderWidth / (this.frameNo - 1) * this.frameCur;
   }
 
   /**
@@ -41,11 +40,14 @@ export class PlayerService {
     if(this.sliderInterval) {
       clearInterval(this.sliderInterval);
     }
-    this.play = false;
+    this.isPlay = false;
   }
 
+  /**
+   * Start
+   */
   public start() {
-    this.play = true;
+    this.isPlay = true;
   }
 
 

@@ -70,7 +70,7 @@ export class SmokeviewComponent implements AfterViewInit {
   }
 
   public control() {
-    if (this.playerService.play) {
+    if (this.playerService.isPlay) {
       this.playerService.stop();
     } else {
       this.playerService.start();

@@ -89,11 +89,14 @@ export class SliceService {
       //this.tex = this.texData.slice(this.playerService.frameCur * this.playerService.frameSize, (this.playerService.frameCur + 1) * this.playerService.frameSize);
       //this.mesh.setVerticesData("texture_coordinate", this.tex, true, 1);
 
-      this.playSlice();
+      //this.playSlice();
 
     }
   }
 
+  /**
+   * Play slice
+   */
   public playSlice() {
     this.playerService.sliderInterval = setInterval(() => {
       if (this.playerService.frameCur == this.playerService.frameNo - 1) this.playerService.frameCur = 0;
@@ -103,6 +106,14 @@ export class SliceService {
       this.playerService.frameCur++;
 
     }, 50);
+  }
+
+  /**
+   * Set current tex data
+   */
+  public setTexData() {
+      this.tex = this.texData.slice(this.playerService.frameCur * this.playerService.frameSize, (this.playerService.frameCur + 1) * this.playerService.frameSize);
+      this.mesh.setVerticesData("texture_coordinate", this.tex, true, 1);
   }
 
   /**

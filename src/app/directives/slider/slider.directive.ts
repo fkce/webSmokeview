@@ -1,6 +1,7 @@
 import { Directive, HostListener, ElementRef, AfterViewInit } from '@angular/core';
 import { PlayerService } from 'src/app/services/player/player.service';
 import { SliceService } from 'src/app/services/slice/slice.service';
+import { toInteger } from 'lodash';
 
 @Directive({
   selector: '[slider]'
@@ -9,11 +10,15 @@ export class SliderDirective implements AfterViewInit {
 
   @HostListener('click', ['$event'])
   onClick(event) {
-
+    this.playerService.sliderWidth = this.el.nativeElement.scrollWidth;
+    this.playerService.frameCur = toInteger(event.offsetX / this.playerService.sliderWidth * this.playerService.frameNo);
+    if (!this.playerService.isPlay) {
+      this.sliceService.setTexData();
+    }
   }
   @HostListener('window:resize', ['$event'])
   onResize(event) {
-    this.playerService.sliderWidth = this.el.nativeElement.offsetWidth;
+    this.playerService.sliderWidth = this.el.nativeElement.scrollWidth;
   }
 
   constructor(
@@ -23,7 +28,6 @@ export class SliderDirective implements AfterViewInit {
   ) { }
 
   ngAfterViewInit() {
-    this.playerService.sliderWidth = this.el.nativeElement.offsetWidth;
-    console.log(this.el.nativeElement.offsetWidth);
+    this.playerService.sliderWidth = this.el.nativeElement.scrollWidth;
   }
 }
