@@ -15,6 +15,8 @@ export class SliceService {
   vertices = [];
   indices = [];
   normals = [];
+  blank = [];
+  isBlank: number = 1;
 
   // Color index for each vertex
   tex = new Float32Array([]);
@@ -55,45 +57,20 @@ export class SliceService {
     this.tex = this.texData.slice(0, this.playerService.frameSize);
 
     // Add colors to vertices
-    this.mesh.setVerticesData("texture_coordinate", this.tex, true, 1);
-
-    var draw = [
-      1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0 - 23
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0];
+    this.mesh.setVerticesData('texture_coordinate', this.tex, true, 1);
 
     // Add colors to vertices
-    this.mesh.setVerticesData("draw", draw, true, 1);
-
+    this.mesh.setVerticesData('blank', this.blank, true, 1);
 
     // Create material with shaders
     if (!this.material) {
-      this.material = new BABYLON.ShaderMaterial("shader", this.babylonService.scene, '/assets/slice',
+      this.material = new BABYLON.ShaderMaterial('shader', this.babylonService.scene, '/assets/slice',
         {
-          attributes: ["position", "color", "normal", "texture_coordinate", "draw"],
-          uniforms: ["world", "worldView", "worldViewProjection", "view", "projection"]
+          attributes: ['position', 'color', 'normal', 'texture_coordinate', 'blank'],
+          uniforms: ['world', 'worldView', 'worldViewProjection', 'view', 'projection']
         });
+
+      this.material.setInt('is_blank', this.isBlank);
       this.material.backFaceCulling = false;
       this.material.useLogarithmicDepth = true;
       this.material.zOffset = 0.2;
@@ -141,6 +118,7 @@ export class SliceService {
           this.vertices = result.data.vertices;
           this.indices = result.data.indices;
           this.texData = result.data.texData;
+          this.blank = result.data.blank;
 
           this.render();
         }
@@ -156,8 +134,23 @@ export class SliceService {
     this.vertices = json.vertices;
     this.indices = json.indices;
     this.texData = new Float32Array(json.texData);
+    this.blank = json.blank;
 
     this.render();
+  }
+
+  /**
+   * Set holes in slice
+   */
+  public setBlank() {
+    if (this.isBlank == 0) {
+      this.isBlank = 1;
+      this.mesh.material.setInt('is_blank', this.isBlank);
+    }
+    else {
+      this.isBlank = 0;
+      this.mesh.material.setInt('is_blank', this.isBlank);
+    }
   }
 
 }

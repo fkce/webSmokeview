@@ -46,7 +46,8 @@ module.exports = function (app) {
 				data: {
 					vertices: slice.vertices,
 					indices: slice.indices,
-					texData: slice.texData
+					texData: slice.texData,
+					blank: slice.blank
 				}
 			}
 			res.send(result)

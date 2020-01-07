@@ -17,6 +17,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSliderModule } from '@angular/material/slider';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SliderDirective } from './directives/slider/slider.directive';
 
 @NgModule({
@@ -37,7 +38,8 @@ import { SliderDirective } from './directives/slider/slider.directive';
     MatButtonModule,
     MatIconModule,
     MatInputModule,
-    MatSliderModule
+    MatSliderModule,
+    MatCheckboxModule
   ],
   providers: [
     HttpManagerService,

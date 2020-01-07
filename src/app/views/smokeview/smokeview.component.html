@@ -41,7 +41,9 @@
             <span><input type="range" [ngModel]="obstService.clipY" (ngModelChange)="obstService.clip($event, 'y')" min="0" max="100" />&nbsp;{{obstService.clipY}}%</span>
             <span><input type="range" [ngModel]="obstService.clipZ" (ngModelChange)="obstService.clip($event, 'z')" min="0" max="100" />&nbsp;{{obstService.clipZ}}%</span><br>
             <button type="button" mat-raised-button (click)="obstService.clip(0, 'x'); obstService.clip(0, 'y'); obstService.clip(100, 'z');">Reset</button>
-
+        </p>
+        <p>
+            <mat-checkbox [ngModel]="sliceService.isBlank" (ngModelChange)="sliceService.setBlank()">Blanked</mat-checkbox>
         </p>
     </div>
 </div>
