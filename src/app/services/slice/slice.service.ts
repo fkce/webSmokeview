@@ -89,7 +89,7 @@ export class SliceService {
       //this.tex = this.texData.slice(this.playerService.frameCur * this.playerService.frameSize, (this.playerService.frameCur + 1) * this.playerService.frameSize);
       //this.mesh.setVerticesData("texture_coordinate", this.tex, true, 1);
 
-      //this.playSlice();
+      this.playSlice();
 
     }
   }
