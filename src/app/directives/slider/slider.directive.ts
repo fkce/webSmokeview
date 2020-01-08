@@ -12,9 +12,7 @@ export class SliderDirective implements AfterViewInit {
   onClick(event) {
     this.playerService.sliderWidth = this.el.nativeElement.scrollWidth;
     this.playerService.frameCur = toInteger(event.offsetX / this.playerService.sliderWidth * this.playerService.frameNo);
-    if (!this.playerService.isPlay) {
-      this.sliceService.setTexData();
-    }
+    this.sliceService.setTex();
   }
   @HostListener('window:resize', ['$event'])
   onResize(event) {

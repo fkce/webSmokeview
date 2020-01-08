@@ -40,7 +40,7 @@
             <button type="button" mat-raised-button (click)="obstService.clip(0, 'x'); obstService.clip(0, 'y'); obstService.clip(100, 'z');">Reset</button>
         </p>
         <p>
-            <mat-checkbox [ngModel]="sliceService.isBlank" (ngModelChange)="sliceService.setBlank()">Blanked</mat-checkbox>
+            <mat-checkbox [ngModel]="sliceService.isBlank" (ngModelChange)="sliceService.toogleBlank()">Blanked</mat-checkbox>
         </p>
     </div>
 </div>

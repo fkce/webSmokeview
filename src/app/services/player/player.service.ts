@@ -5,11 +5,11 @@ import { Injectable } from '@angular/core';
 })
 export class PlayerService {
 
-  isPlay: boolean = true;
+  isPlay: boolean = false;
 
   dt: number = 50;
 
-  frameSize: number = 0;
+  //frameSize: number = 0;
   frameNo: number = 0;
   frameCur: number = 0;
 

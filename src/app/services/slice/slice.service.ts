@@ -2,7 +2,7 @@ import { Injectable, isDevMode } from '@angular/core';
 import { HttpManagerService, Result } from '../http-manager/http-manager.service';
 import { BabylonService } from '../babylon/babylon.service';
 import * as BABYLON from 'babylonjs';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, forEach } from 'lodash';
 import { environment } from '../../../environments/environment';
 import { colorbars as Colorbars } from '../../consts/colorbars';
 import { PlayerService } from '../player/player.service';
@@ -19,7 +19,7 @@ export class SliceService {
   blank = [];
   isBlank: number = 1;
 
-  slices: [Slice];
+  slices: Slice[] = [];
 
   // Color index for each vertex
   tex = new Float32Array([]);
@@ -36,89 +36,38 @@ export class SliceService {
   ) { }
 
   /**
-   * Render current obst geometry
+   * Play slice ?? redefine it ... especially sliderInterval should be sliceInterval or something. Maybe put all result in one interval ...
    */
-  public render() {
-
-    if (!this.mesh) {
-      // Create new custom mesh and vertex data
-      this.mesh = new BABYLON.Mesh("custom", this.babylonService.scene);
-      this.vertexData = new BABYLON.VertexData();
-    }
-
-    // Compute normals
-    BABYLON.VertexData.ComputeNormals(this.vertices, this.indices, this.normals);
-
-    // Assign data
-    this.vertexData.positions = this.vertices;
-    this.vertexData.indices = this.indices;
-    this.vertexData.normals = this.normals;
-    this.vertexData.applyToMesh(this.mesh, true);
-
-    this.playerService.frameSize = this.vertices.length / 3;
-    this.playerService.frameNo = this.texData.length / this.playerService.frameSize;
-    this.tex = this.texData.slice(0, this.playerService.frameSize);
-
-    // Add colors to vertices
-    this.mesh.setVerticesData('texture_coordinate', this.tex, true, 1);
-
-    // Add colors to vertices
-    this.mesh.setVerticesData('blank', this.blank, true, 1);
-
-    // Create material with shaders
-    if (!this.material) {
-      this.material = new BABYLON.ShaderMaterial('shader', this.babylonService.scene, '/assets/slice',
-        {
-          attributes: ['position', 'color', 'normal', 'texture_coordinate', 'blank'],
-          uniforms: ['world', 'worldView', 'worldViewProjection', 'view', 'projection']
-        });
-
-      this.material.setInt('is_blank', this.isBlank);
-      this.material.backFaceCulling = false;
-      this.material.useLogarithmicDepth = true;
-      this.material.zOffset = 0.2;
-
-      // Create RawTexture to sample the colors in fragment shaders
-      let texture_colorbar = new BABYLON.RawTexture(Colorbars.rainbow.colors, 1, Colorbars.rainbow.number, BABYLON.Engine.TEXTUREFORMAT_RGBA, this.babylonService.scene, false, false, BABYLON.Texture.LINEAR_LINEAR, BABYLON.Engine.TEXTURETYPE_UNSIGNED_BYTE);
-      texture_colorbar.wrapR = BABYLON.Texture.CLAMP_ADDRESSMODE;
-      texture_colorbar.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
-
-      this.material.setTexture('texture_colorbar_sampler', texture_colorbar);
-
-      this.mesh.material = this.material;
-
-      // Set manually time
-      //this.playerService.frameCur = 0;
-      //this.tex = this.texData.slice(this.playerService.frameCur * this.playerService.frameSize, (this.playerService.frameCur + 1) * this.playerService.frameSize);
-      //this.mesh.setVerticesData("texture_coordinate", this.tex, true, 1);
-
-      this.playSlice();
-
-    }
-  }
-
-  /**
-   * Play slice
-   */
-  public playSlice() { // Play dla wszyskich sliceow
+  public playSlice() {
     this.playerService.sliderInterval = setInterval(() => {
       if (this.playerService.frameCur == this.playerService.frameNo - 1) this.playerService.frameCur = 0;
 
-      // foreach slice 
-      this.tex = this.texData.slice(this.playerService.frameCur * this.playerService.frameSize, (this.playerService.frameCur + 1) * this.playerService.frameSize);
-      this.mesh.setVerticesData("texture_coordinate", this.tex, true, 1);
-      // end foreach
+      forEach(this.slices, (slice: Slice) => {
+        slice.tex = slice.texData.slice(this.playerService.frameCur * slice.frameSize, (this.playerService.frameCur + 1) * slice.frameSize);
+        slice.mesh.setVerticesData("texture_coordinate", slice.tex, true, 1);
+      });
       this.playerService.frameCur++;
 
     }, 50);
   }
 
   /**
-   * Set current tex data
+   * Get obsts from json file
+   * @param json Object with vertices, colors, indices, normals
    */
-  public setTexData() {
-      this.tex = this.texData.slice(this.playerService.frameCur * this.playerService.frameSize, (this.playerService.frameCur + 1) * this.playerService.frameSize);
-      this.mesh.setVerticesData("texture_coordinate", this.tex, true, 1);
+  public getFromFile(json: any) {
+
+    // First stop playing and set current frame to 0
+    this.playerService.frameCur = 0;
+    this.setTex();
+    this.playerService.stop();
+
+    // If loaded slice has less frames change frame number || current frame no is equal to 0
+    if (this.playerService.frameNo > json.texData.length / (json.vertices.length / 3) || this.playerService.frameNo == 0) {
+      this.playerService.frameNo = json.texData.length / (json.vertices.length / 3);
+    }
+
+    this.slices.push(new Slice(json.vertices, json.indices, json.blank, new Float32Array(json.texData), this.babylonService.scene));
   }
 
   /**
@@ -128,48 +77,36 @@ export class SliceService {
 
     this.httpManager.get(environment.host + '/api/slices').then(
       (result: Result) => {
-
         if (result.meta.status == 'success') {
-          // Asigning variables
-          this.vertices = result.data.vertices;
-          this.indices = result.data.indices;
-          this.texData = result.data.texData;
-          this.blank = result.data.blank;
 
-          // Tutaj dodanie frameNo jezeli jest 0 lub undefinded
-          // Tutaj new Slice
+          // If loaded slice has less frames change frame number || current frame no is equal to 0
+          if (this.playerService.frameNo > result.data.texData.length / (result.data.vertices.length / 3) || this.playerService.frameNo == 0) {
+            this.playerService.frameNo = result.data.texData.length / (result.data.vertices.length / 3);
+          }
 
-          this.render();
+          this.slices.push(new Slice(result.data.vertices, result.data.indices, result.data.blank, new Float32Array(result.data.texData), this.babylonService.scene));
         }
       });
   }
 
   /**
-   * Get obsts from json file
-   * @param json Object with vertices, colors, indices, normals
+   * Set holes in slice
    */
-  public getFromFile(json: any) {
+  public toogleBlank() {
 
-    this.vertices = json.vertices;
-    this.indices = json.indices;
-    this.texData = new Float32Array(json.texData);
-    this.blank = json.blank;
-
-    this.render();
+    forEach(this.slices, (slice: Slice) => {
+      slice.toogleBlank();
+    });
   }
 
   /**
-   * Set holes in slice
+   * Set current tex data
    */
-  public setBlank() {
-    if (this.isBlank == 0) {
-      this.isBlank = 1;
-      this.mesh.material.setInt('is_blank', this.isBlank);
-    }
-    else {
-      this.isBlank = 0;
-      this.mesh.material.setInt('is_blank', this.isBlank);
-    }
+  public setTex() {
+
+    forEach(this.slices, (slice: Slice) => {
+      slice.setTex(this.playerService.frameCur);
+    });
   }
 
 }
