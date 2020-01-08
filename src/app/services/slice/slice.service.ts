@@ -6,6 +6,7 @@ import { cloneDeep } from 'lodash';
 import { environment } from '../../../environments/environment';
 import { colorbars as Colorbars } from '../../consts/colorbars';
 import { PlayerService } from '../player/player.service';
+import { Slice } from './slice';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,8 @@ export class SliceService {
   normals = [];
   blank = [];
   isBlank: number = 1;
+
+  slices: [Slice];
 
   // Color index for each vertex
   tex = new Float32Array([]);
@@ -97,12 +100,14 @@ export class SliceService {
   /**
    * Play slice
    */
-  public playSlice() {
+  public playSlice() { // Play dla wszyskich sliceow
     this.playerService.sliderInterval = setInterval(() => {
       if (this.playerService.frameCur == this.playerService.frameNo - 1) this.playerService.frameCur = 0;
 
+      // foreach slice 
       this.tex = this.texData.slice(this.playerService.frameCur * this.playerService.frameSize, (this.playerService.frameCur + 1) * this.playerService.frameSize);
       this.mesh.setVerticesData("texture_coordinate", this.tex, true, 1);
+      // end foreach
       this.playerService.frameCur++;
 
     }, 50);
@@ -130,6 +135,9 @@ export class SliceService {
           this.indices = result.data.indices;
           this.texData = result.data.texData;
           this.blank = result.data.blank;
+
+          // Tutaj dodanie frameNo jezeli jest 0 lub undefinded
+          // Tutaj new Slice
 
           this.render();
         }

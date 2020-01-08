@@ -28,8 +28,8 @@ export class SmokeviewComponent implements AfterViewInit {
 
     this.babylonService.createScene(this.rendererCanvas);
 
-    this.obstService.getFromServer();
-    this.sliceService.getFromServer();
+    //this.obstService.getFromServer();
+    //this.sliceService.getFromServer();
 
     this.babylonService.animate();
 
