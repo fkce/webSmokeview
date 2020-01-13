@@ -2,11 +2,11 @@
     <div class="left">
         <p class="upload">
             <button type="button" mat-raised-button (click)="fileObstInput.click()">Upload OBST .json file ...</button>
-            <input hidden (change)="onObstFileSelected()" #fileObstInput type="file" id="fileObst">
+            <input hidden (change)="onObstFileSelected()" #fileObstInput type="file" id="fileObst" accept=".json">
         </p>
         <p class="upload">
             <button type="button" mat-raised-button (click)="fileSliceInput.click()">Upload SLCF .json file ...</button>
-            <input hidden (change)="onSliceFileSelected()" #fileSliceInput type="file" id="fileSlice">
+            <input hidden (change)="onSliceFileSelected()" #fileSliceInput type="file" id="fileSlice" accept=".json">
         </p>
         <p>
             <button type="button" mat-raised-button (click)="obstService.getFromServer();sliceService.getFromServer()">Show example</button>
