@@ -8,6 +8,9 @@
             <button type="button" mat-raised-button (click)="fileSliceInput.click()">Upload SLCF .json file ...</button>
             <input hidden (change)="onSliceFileSelected()" #fileSliceInput type="file" id="fileSlice">
         </p>
+        <p>
+            <button type="button" mat-raised-button (click)="obstService.getFromServer();sliceService.getFromServer()">Show example</button>
+        </p>
     </div>
 
     <div class="center">
