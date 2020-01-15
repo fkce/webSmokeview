@@ -17,9 +17,10 @@
         <canvas class="renderer" #rendererCanvas if="renderCanvas"></canvas>
         <button class="reset-view" type="button" mat-raised-button (click)="obstService.zoomToCenter()">Reset view</button>
         <button class="reset-zoom" type="button" mat-raised-button (click)="obstService.zoomToMesh()">Reset zoom</button>
-        <button class="wireframe" type="button" mat-raised-button [color]="(obstService.material != undefined && obstService.material.wireframe) ? 'accent' : ''" (click)="obstService.material.wireframe = obstService.material.wireframe ? false : true;">Outline</button>
+        <button class="triangle" type="button" mat-raised-button [color]="(obstService.material != undefined && obstService.material.wireframe) ? 'accent' : ''" (click)="obstService.material.wireframe = obstService.material.wireframe ? false : true;">Trinagles</button>
+        <button class="wireframe" type="button" mat-raised-button [color]="(obstService.mesh != undefined && obstService.mesh.edgesWidth) ? 'accent' : ''" (click)="obstService.mesh.edgesWidth = obstService.mesh.edgesWidth == 0.0 ? 0.1 : 0.0;">Outline</button>
 
-        <div class="player">
+        <div class="player" *ngIf="playerService.frameNo > 0">
             <div class="time">Frame: {{playerService.frameCur}}</div>
             <mat-icon class="controler" (click)="control()" *ngIf="!playerService.isPlay">play_circle_outline</mat-icon>
             <mat-icon class="controler" (click)="control()" *ngIf="playerService.isPlay">pause_circle_outline</mat-icon>
