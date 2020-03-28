@@ -8,8 +8,15 @@
             <button type="button" mat-raised-button (click)="fileSliceInput.click()">Upload SLCF .json file ...</button>
             <input hidden (change)="onSliceFileSelected()" #fileSliceInput type="file" id="fileSlice" accept=".json">
         </p>
+        <p class="upload">
+            <button type="button" mat-raised-button (click)="fileFdsInput.click()">Upload .fds file ...</button>
+            <input hidden (change)="onFdsFileSelected()" #fileFdsInput type="file" id="fileFds" accept=".fds">
+        </p>
         <p>
             <button type="button" mat-raised-button (click)="obstService.getFromServer();sliceService.getFromServer()">Show example</button>
+        </p>
+        <p>
+            <button type="button" mat-raised-button (click)="obstService.getTest()">Test geom</button>
         </p>
     </div>
 

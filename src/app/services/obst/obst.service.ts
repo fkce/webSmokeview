@@ -2,8 +2,9 @@ import { Injectable, isDevMode } from '@angular/core';
 import { HttpManagerService, Result } from '../http-manager/http-manager.service';
 import { BabylonService } from '../babylon/babylon.service';
 import * as BABYLON from 'babylonjs';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, forEach, concat } from 'lodash';
 import { environment } from '../../../environments/environment';
+import { HelpersService } from '../helpers/helpers.service';
 
 @Injectable({
   providedIn: 'root'
@@ -25,8 +26,38 @@ export class ObstService {
 
   constructor(
     private httpManager: HttpManagerService,
-    private babylonService: BabylonService
+    private babylonService: BabylonService,
+    private helperService: HelpersService
   ) { }
+
+
+  public getTest(geometry: any) {
+
+    //let geometry = [
+    //  {
+    //    xb: [0.0, 0.4, 0.0, 0.1, 0.0, 1.0],
+    //    color: [1.0, 0.0, 0.0, 1.0]
+    //  },
+    //  {
+    //    xb: [0.5, 0.8, 0.2, 0.3, 0.0, 0.5],
+    //    color: [0.0, 1.0, 0.0, 1.0]
+    //  },
+    //  {
+    //    xb: [0.0, 0.2, 0.6, 0.7, 0.0, 0.2],
+    //    color: [0.0, 0.0, 1.0, 1.0]
+    //  }
+    //];
+
+    forEach(geometry, (obst, index: number) => {
+      this.vertices.push(...this.helperService.getVertices(obst.xb));
+      this.colors.push(...this.helperService.getColors(obst.color));
+      this.indices.push(...this.helperService.getIndices(index));
+    });
+
+    this.render();
+    //this.zoomToCenter();
+    //this.zoomToMesh();
+  }
 
   /**
    * Render current obst geometry
@@ -62,17 +93,19 @@ export class ObstService {
           attributes: ["position", "color", "normal"],
           uniforms: ["world", "worldView", "worldViewProjection", "view", "projection"]
         });
+
+      this.material.setFloat("clipX", -0.001);
+      this.material.setFloat("clipY", -0.001);
+      this.material.setFloat("clipZ", 1.001);
+
+      this.mesh.material = this.material;
+      this.mesh.enableEdgesRendering();
+      this.mesh.edgesWidth = 0.1;
+      this.mesh.edgesColor = new BABYLON.Color4(0, 0, 1, 1);
+
       this.material.backFaceCulling = false;
       this.material.useLogarithmicDepth = true;
 
-      this.material.setFloat("clipX", 0);
-      this.material.setFloat("clipY", 0);
-      this.material.setFloat("clipZ", 1);
-      //this.material.wireframe = true;
-      this.mesh.material = this.material;
-      this.mesh.enableEdgesRendering(); 
-      this.mesh.edgesWidth = 0.1;
-      this.mesh.edgesColor = new BABYLON.Color4(0, 0, 1, 1);
     }
   }
 
@@ -84,12 +117,12 @@ export class ObstService {
   public clip(value: number, direction: string) {
 
     let boundingMax = this.mesh.getBoundingInfo().maximum;
-    if(direction == 'x') {
+    if (direction == 'x') {
       this.clipX = value;
       let clip = (value == 100) ? 1.1 : boundingMax.x * (value / 100);
       clip = (value == 0) ? -0.1 : clip;
       this.mesh.material.setFloat("clipX", clip);
-    } 
+    }
     else if (direction == 'y') {
       this.clipY = value;
       let clip = (value == 100) ? 1.1 : boundingMax.y * (value / 100);
@@ -109,7 +142,7 @@ export class ObstService {
    */
   public getFromServer() {
 
-    this.httpManager.get(environment.host +'/api/obsts').then(
+    this.httpManager.get(environment.host + '/api/obsts').then(
       (result: Result) => {
 
         if (result.meta.status == 'success') {
@@ -149,7 +182,7 @@ export class ObstService {
     let bounding = cloneDeep(this.mesh.getBoundingInfo().boundingSphere);
 
     this.babylonService.camera.setTarget(bounding.centerWorld);
-    this.babylonService.camera.setPosition(new BABYLON.Vector3(bounding.centerWorld.x, bounding.centerWorld.y -2, bounding.centerWorld.z));
+    this.babylonService.camera.setPosition(new BABYLON.Vector3(bounding.centerWorld.x, bounding.centerWorld.y - 2, bounding.centerWorld.z));
   }
 
   /**
