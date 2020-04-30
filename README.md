@@ -14,7 +14,7 @@ $ node app.js # run node.js server
 ```
 5. Open in web-browser: ``http://localhost:3000``
 
-## Development servers
+## Development server
 1. Clone git repo.
 2. Get Node.js: https://nodejs.org/en/download/ or install it using package manager.
 3. Run command line and install all required javascript packages:
